@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>时空信标 · 循环自救 - 第1024次循环</title>
+    <title>时空信标 · 循环自救</title>
     <style>
-        /* 基础重置与变量 */
+        /* ========== 基础样式 ========== */
         :root {
             --primary-color: #1a1a2e;
             --secondary-color: #16213e;
@@ -32,9 +32,12 @@
             position: relative;
         }
         
-        /* CRT 显示器效果 */
-        body::before {
-            content: "";
+        .hidden {
+            display: none !important;
+        }
+        
+        /* ========== CRT效果 ========== */
+        .crt-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -57,7 +60,124 @@
             opacity: 0.6;
         }
         
-        /* 主容器 */
+        /* ========== 序章页面 ========== */
+        #prologue-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0c0c2e 0%, #1a1a2e 50%, #16213e 100%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            cursor: pointer;
+        }
+        
+        .prologue-title {
+            text-align: center;
+            margin-bottom: 50px;
+            z-index: 2;
+        }
+        
+        .main-title {
+            font-size: 3.5em;
+            color: #00b4d8;
+            text-shadow: 0 0 20px rgba(0, 180, 216, 0.7);
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+        
+        .sub-title {
+            font-size: 1.8em;
+            color: #ffd43b;
+            text-shadow: 0 0 10px rgba(255, 212, 59, 0.5);
+            margin-bottom: 10px;
+        }
+        
+        .title-en {
+            font-size: 1.2em;
+            color: #51cf66;
+            letter-spacing: 2px;
+        }
+        
+        .story-container {
+            max-width: 800px;
+            background: rgba(10, 14, 33, 0.85);
+            border: 1px solid rgba(0, 180, 216, 0.3);
+            border-radius: 10px;
+            padding: 40px;
+            margin: 0 20px 40px;
+            z-index: 2;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 30px rgba(0, 180, 216, 0.2);
+            line-height: 1.8;
+            min-height: 300px;
+        }
+        
+        .story-text {
+            font-size: 1.1em;
+            min-height: 200px;
+        }
+        
+        .click-hint {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9em;
+            animation: pulse 2s infinite;
+        }
+        
+        .story-paragraph {
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .story-paragraph.visible {
+            animation: fadeInUp 0.8s forwards;
+        }
+        
+        .keyword {
+            color: #00b4d8;
+            text-shadow: 0 0 10px rgba(0, 180, 216, 0.5);
+            font-weight: bold;
+        }
+        
+        .warning {
+            color: #ffd43b;
+            text-shadow: 0 0 10px rgba(255, 212, 59, 0.5);
+        }
+        
+        .danger {
+            color: #ff6b6b;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+        }
+        
+        .skip-btn {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.5);
+            color: #ff6b6b;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 3;
+        }
+        
+        .skip-btn:hover {
+            background: rgba(255, 107, 107, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        /* ========== 主游戏界面 ========== */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -94,11 +214,6 @@
             pointer-events: none;
         }
         
-        @keyframes scan {
-            0% { transform: translateY(-100%) rotate(45deg); }
-            100% { transform: translateY(100%) rotate(45deg); }
-        }
-        
         .loop-counter {
             font-size: 1.2em;
             color: var(--glow-color);
@@ -130,7 +245,7 @@
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--accent-color), var(--glow-color));
-            width: 14.28%; /* 1/7 */
+            width: 14.28%;
             transition: width 1s ease;
             position: relative;
         }
@@ -151,11 +266,6 @@
             animation: shimmer 2s infinite;
         }
         
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        
         /* 主内容区 */
         .main-content {
             display: grid;
@@ -170,7 +280,6 @@
             border: 1px solid var(--accent-color);
             border-radius: 8px;
             padding: 25px;
-            font-family: 'Courier New', monospace;
             position: relative;
             min-height: 500px;
             overflow-y: auto;
@@ -197,11 +306,6 @@
             animation: blink 1s infinite;
             vertical-align: middle;
             margin-left: 2px;
-        }
-        
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
         }
         
         /* 控制面板 */
@@ -322,7 +426,7 @@
             align-items: flex-start;
         }
         
-        /* 血迹效果 - 循环痕迹 */
+        /* 血迹效果 */
         .bloodstain {
             position: fixed;
             pointer-events: none;
@@ -428,7 +532,6 @@
             min-height: 80px;
             max-height: 200px;
             overflow-y: auto;
-            font-family: 'Courier New', monospace;
             font-size: 0.9em;
             white-space: pre-wrap;
         }
@@ -489,6 +592,29 @@
         .trace-icon.burn { background: #ff4500; }
         .trace-icon.code { background: var(--glow-color); }
         
+        /* 按钮样式 */
+        .btn {
+            background: var(--accent-color);
+            color: white;
+            border: 1px solid var(--glow-color);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            background: var(--glow-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 180, 216, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
         /* 响应式设计 */
         @media (max-width: 900px) {
             .main-content {
@@ -503,11 +629,53 @@
                 width: 50px;
                 height: 50px;
             }
+            
+            .main-title {
+                font-size: 2.5em;
+            }
+            
+            .sub-title {
+                font-size: 1.4em;
+            }
         }
         
-        /* 打印效果 */
-        .print-effect {
-            animation: print 0.5s steps(40, end);
+        /* 动画定义 */
+        @keyframes scan {
+            0% { transform: translateY(-100%) rotate(45deg); }
+            100% { transform: translateY(100%) rotate(45deg); }
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        @keyframes titleGlow {
+            0% { text-shadow: 0 0 20px rgba(0, 180, 216, 0.7); }
+            100% { text-shadow: 0 0 30px rgba(0, 180, 216, 0.9), 0 0 40px rgba(0, 180, 216, 0.5); }
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
         
         @keyframes print {
@@ -515,178 +683,209 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* 解密成功效果 */
-        @keyframes celebrate {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        .print-effect {
+            animation: print 0.5s steps(40, end);
         }
         
-        .celebrate {
-            animation: celebrate 0.5s ease;
+        /* 粒子画布 */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
         }
     </style>
 </head>
 <body>
-    <!-- 血迹痕迹 -->
-    <div class="bloodstain" style="top: 10%; left: 15%; width: 100px; height: 80px; transform: rotate(30deg); background: radial-gradient(circle, #8b0000 0%, transparent 70%);"></div>
-    <div class="bloodstain" style="top: 60%; right: 20%; width: 150px; height: 60px; transform: rotate(-15deg); background: radial-gradient(circle, #8b0000 0%, transparent 70%);"></div>
-
-    <div class="container">
-        <!-- 头部信息 -->
-        <div class="header">
-            <div class="loop-counter">
-                <span id="current-loop">第 1024 次循环</span> | 
-                <span id="time-remaining">时空稳定度: 23.7%</span>
-            </div>
-            <div class="progress-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progress-fill"></div>
-                </div>
-                <div class="time-coordinates-info" style="margin-top: 10px; font-size: 0.9em;">
-                    已修复坐标: <span id="solved-count">0</span>/7 | 
-                    下次重置: <span id="reset-timer">71:58:23</span>
-                </div>
-            </div>
+    <!-- CRT效果层 -->
+    <div class="crt-overlay"></div>
+    
+    <!-- ========== 序章页面 ========== -->
+    <div id="prologue-page">
+        <!-- 粒子背景 -->
+        <canvas id="particle-canvas"></canvas>
+        
+        <!-- 标题 -->
+        <div class="prologue-title">
+            <h1 class="main-title">时空信标</h1>
+            <h2 class="sub-title">循环自救</h2>
+            <div class="title-en">CHRONO BEACON: LOOP SALVATION</div>
         </div>
+        
+        <!-- 故事容器 -->
+        <div class="story-container">
+            <div class="story-text" id="story-text">
+                <!-- 故事内容将通过JS动态加载 -->
+            </div>
+            <div class="click-hint">点击继续...</div>
+        </div>
+        
+        <!-- 跳过按钮 -->
+        <button class="skip-btn" onclick="skipPrologue()">跳过序章 (ESC)</button>
+    </div>
+    
+    <!-- ========== 主游戏界面 ========== -->
+    <div id="game-container" class="hidden">
+        <!-- 血迹痕迹 -->
+        <div class="bloodstain" style="top: 10%; left: 15%; width: 100px; height: 80px; transform: rotate(30deg);"></div>
+        <div class="bloodstain" style="top: 60%; right: 20%; width: 150px; height: 60px; transform: rotate(-15deg);"></div>
 
-        <!-- 主内容区 -->
-        <div class="main-content">
-            <!-- 终端界面 -->
-            <div class="terminal">
-                <div class="terminal-header">
-                    <div class="prompt">时空信标 v3.14.15 ></div>
-                    <div class="status">状态: <span id="terminal-status">在线</span></div>
+        <div class="container">
+            <!-- 头部信息 -->
+            <div class="header">
+                <div class="loop-counter">
+                    <span id="current-loop">第 1024 次循环</span> | 
+                    <span id="time-remaining">时空稳定度: 23.7%</span>
                 </div>
-                
-                <div id="terminal-output">
-                    <div class="output-line system">[系统] 时空信标已启动...</div>
-                    <div class="output-line system">[系统] 检测到第1024次循环异常...</div>
-                    <div class="output-line system">[系统] 载入初始笔记碎片...</div>
-                    <div class="output-line">></div>
-                </div>
-                
-                <!-- 初始笔记谜题 -->
-                <div class="puzzle-container active" id="puzzle-notes">
-                    <h3>初始笔记重建</h3>
-                    <p>收集到的笔记碎片，按正确顺序排列以重建第一次循环的记忆：</p>
-                    
-                    <div class="note-fragments" id="note-fragments">
-                        <!-- 碎片将通过JS动态生成 -->
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
                     </div>
-                    
-                    <div class="fragment-slot" id="note-slots">
-                        <div class="slot-placeholder" style="color: #666; width: 100%; text-align: center; padding: 30px;">
-                            将碎片拖放到此处进行排列
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 20px;">
-                        <button class="btn" onclick="checkNoteOrder()">验证序列</button>
-                        <button class="btn" onclick="showHint('notes')">提示</button>
-                    </div>
-                    
-                    <div class="output" id="note-output">
-                        // 重建进度将显示在这里
+                    <div class="time-coordinates-info" style="margin-top: 10px; font-size: 0.9em;">
+                        已修复坐标: <span id="solved-count">0</span>/7 | 
+                        下次重置: <span id="reset-timer">71:58:23</span>
                     </div>
                 </div>
-                
-                <!-- 古埃及谜题 -->
-                <div class="puzzle-container" id="puzzle-egypt">
-                    <h3>坐标: 古埃及 (公元前1341年)</h3>
-                    <p>破译星象石板上的符号，调整至正确的星座位置：</p>
-                    
-                    <div class="hieroglyph-grid" id="hieroglyph-grid">
-                        <!-- 象形文字将通过JS动态生成 -->
+            </div>
+
+            <!-- 主内容区 -->
+            <div class="main-content">
+                <!-- 终端界面 -->
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="prompt">时空信标 v3.14.15 ></div>
+                        <div class="status">状态: <span id="terminal-status">在线</span></div>
                     </div>
                     
-                    <div style="margin: 20px 0;">
-                        <div>星座序列:</div>
-                        <div id="constellation-sequence" style="font-size: 1.2em; letter-spacing: 5px; margin: 10px 0;">???????</div>
+                    <div id="terminal-output">
+                        <div class="output-line system">[系统] 时空信标已启动...</div>
+                        <div class="output-line system">[系统] 检测到第1024次循环异常...</div>
+                        <div class="output-line system">[系统] 载入初始笔记碎片...</div>
+                        <div class="output-line">></div>
                     </div>
                     
-                    <div>
-                        <div style="margin-bottom: 10px;">已知规则:</div>
-                        <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px; font-size: 0.9em;">
-                            1. 圣甲虫(𓆣)必在鹰(𓅃)之后<br>
-                            2. 莲花(𓆨)不能在蛇(𓆙)旁边<br>
-                            3. 太阳(𓇳)必须在第二或第五位<br>
-                            4. 三个符号符号𓅃𓆣𓇳必须相邻
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 20px;">
-                        <button class="btn" onclick="checkHieroglyphs()">验证排列</button>
-                        <button class="btn" onclick="showHint('egypt')">提示</button>
-                        <button class="btn" onclick="autoSolveEgypt()">自动求解</button>
-                    </div>
-                    
-                    <div class="output" id="egypt-output"></div>
-                </div>
-                
-                <!-- 二战密码机谜题 -->
-                <div class="puzzle-container" id="puzzle-enigma">
-                    <h3>坐标: 布莱切利公园 (1943年)</h3>
-                    <p>设置恩尼格玛密码机，破译加密信息：</p>
-                    
-                    <div class="enigma-machine">
-                        <div class="rotor">
-                            <div class="rotor-wheel" id="rotor-1">A</div>
-                            <div class="rotor-wheel" id="rotor-2">A</div>
-                            <div class="rotor-wheel" id="rotor-3">A</div>
+                    <!-- 初始笔记谜题 -->
+                    <div class="puzzle-container active" id="puzzle-notes">
+                        <h3>初始笔记重建</h3>
+                        <p>收集到的笔记碎片，按正确顺序排列以重建第一次循环的记忆：</p>
+                        
+                        <div class="note-fragments" id="note-fragments">
+                            <!-- 碎片将通过JS动态生成 -->
                         </div>
                         
-                        <div style="text-align: center; margin: 20px 0;">
-                            <div>加密文本:</div>
-                            <div style="font-family: monospace; background: rgba(0,0,0,0.5); padding: 10px; margin: 10px; border-radius: 4px;">
-                                KXZTP YBMQJ RWVHD CFNES GILAU
+                        <div class="fragment-slot" id="note-slots">
+                            <div class="slot-placeholder" style="color: #666; width: 100%; text-align: center; padding: 30px;">
+                                将碎片拖放到此处进行排列
                             </div>
                         </div>
                         
-                        <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; margin: 20px;">
-                            <!-- 转子位置控制 -->
-                            <button class="btn" onclick="adjustRotor(1, -1)">← 1</button>
-                            <div style="text-align: center;">转子I</div>
-                            <button class="btn" onclick="adjustRotor(1, 1)">1 →</button>
-                            
-                            <button class="btn" onclick="adjustRotor(2, -1)">← 2</button>
-                            <div style="text-align: center;">转子II</div>
-                            <button class="btn" onclick="adjustRotor(2, 1)">2 →</button>
-                            
-                            <button class="btn" onclick="adjustRotor(3, -1)">← 3</button>
-                            <div style="text-align: center;">转子III</div>
-                            <button class="btn" onclick="adjustRotor(3, 1)">3 →</button>
+                        <div style="margin-top: 20px;">
+                            <button class="btn" onclick="checkNoteOrder()">验证序列</button>
+                            <button class="btn" onclick="showHint('notes')">提示</button>
+                        </div>
+                        
+                        <div class="output" id="note-output">
+                            // 重建进度将显示在这里
                         </div>
                     </div>
                     
-                    <div style="margin-top: 20px;">
-                        <div>破译结果:</div>
-                        <div id="decoded-text" style="font-family: monospace; font-size: 1.2em; letter-spacing: 2px; margin: 10px 0; min-height: 30px; color: var(--warning-color);">
-                            ????????????????????????????
+                    <!-- 古埃及谜题 -->
+                    <div class="puzzle-container" id="puzzle-egypt">
+                        <h3>坐标: 古埃及 (公元前1341年)</h3>
+                        <p>破译星象石板上的符号，调整至正确的星座位置：</p>
+                        
+                        <div class="hieroglyph-grid" id="hieroglyph-grid">
+                            <!-- 象形文字将通过JS动态生成 -->
                         </div>
+                        
+                        <div style="margin: 20px 0;">
+                            <div>星座序列:</div>
+                            <div id="constellation-sequence" style="font-size: 1.2em; letter-spacing: 5px; margin: 10px 0;">???????</div>
+                        </div>
+                        
+                        <div>
+                            <div style="margin-bottom: 10px;">已知规则:</div>
+                            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px; font-size: 0.9em;">
+                                1. 圣甲虫(𓆣)必在鹰(𓅃)之后<br>
+                                2. 莲花(𓆨)不能在蛇(𓆙)旁边<br>
+                                3. 太阳(𓇳)必须在第二或第五位<br>
+                                4. 三个符号符号𓅃𓆣𓇳必须相邻
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 20px;">
+                            <button class="btn" onclick="checkHieroglyphs()">验证排列</button>
+                            <button class="btn" onclick="showHint('egypt')">提示</button>
+                            <button class="btn" onclick="autoSolveEgypt()">自动求解</button>
+                        </div>
+                        
+                        <div class="output" id="egypt-output"></div>
                     </div>
                     
-                    <div style="margin-top: 20px;">
-                        <button class="btn" onclick="decodeEnigma()">破译</button>
-                        <button class="btn" onclick="showHint('enigma')">提示</button>
-                        <button class="btn" onclick="bruteForceEnigma()">暴力破解</button>
+                    <!-- 二战密码机谜题 -->
+                    <div class="puzzle-container" id="puzzle-enigma">
+                        <h3>坐标: 布莱切利公园 (1943年)</h3>
+                        <p>设置恩尼格玛密码机，破译加密信息：</p>
+                        
+                        <div class="enigma-machine">
+                            <div class="rotor">
+                                <div class="rotor-wheel" id="rotor-1">A</div>
+                                <div class="rotor-wheel" id="rotor-2">A</div>
+                                <div class="rotor-wheel" id="rotor-3">A</div>
+                            </div>
+                            
+                            <div style="text-align: center; margin: 20px 0;">
+                                <div>加密文本:</div>
+                                <div style="font-family: monospace; background: rgba(0,0,0,0.5); padding: 10px; margin: 10px; border-radius: 4px;">
+                                    KXZTP YBMQJ RWVHD CFNES GILAU
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; margin: 20px;">
+                                <button class="btn" onclick="adjustRotor(1, -1)">← 1</button>
+                                <div style="text-align: center;">转子I</div>
+                                <button class="btn" onclick="adjustRotor(1, 1)">1 →</button>
+                                
+                                <button class="btn" onclick="adjustRotor(2, -1)">← 2</button>
+                                <div style="text-align: center;">转子II</div>
+                                <button class="btn" onclick="adjustRotor(2, 1)">2 →</button>
+                                
+                                <button class="btn" onclick="adjustRotor(3, -1)">← 3</button>
+                                <div style="text-align: center;">转子III</div>
+                                <button class="btn" onclick="adjustRotor(3, 1)">3 →</button>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 20px;">
+                            <div>破译结果:</div>
+                            <div id="decoded-text" style="font-family: monospace; font-size: 1.2em; letter-spacing: 2px; margin: 10px 0; min-height: 30px; color: var(--warning-color);">
+                                ????????????????????????????
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 20px;">
+                            <button class="btn" onclick="decodeEnigma()">破译</button>
+                            <button class="btn" onclick="showHint('enigma')">提示</button>
+                            <button class="btn" onclick="bruteForceEnigma()">暴力破解</button>
+                        </div>
+                        
+                        <div class="output" id="enigma-output"></div>
                     </div>
                     
-                    <div class="output" id="enigma-output"></div>
-                </div>
-                
-                <!-- 复古游戏谜题 -->
-                <div class="puzzle-container" id="puzzle-retro">
-                    <h3>坐标: 1987年游戏机房</h3>
-                    <p>修复游戏代码中的BUG，让主角通过关卡：</p>
-                    
-                    <div class="pixel-game">
-                        <canvas class="pixel-canvas" id="game-canvas" width="400" height="300"></canvas>
-                    </div>
-                    
-                    <div style="margin: 20px 0;">
-                        <div>游戏代码:</div>
-                        <textarea id="game-code" style="width: 100%; height: 150px; background: #000; color: #0f0; font-family: monospace; padding: 10px; border: 2px solid #0f0; margin: 10px 0;">
+                    <!-- 复古游戏谜题 -->
+                    <div class="puzzle-container" id="puzzle-retro">
+                        <h3>坐标: 1987年游戏机房</h3>
+                        <p>修复游戏代码中的BUG，让主角通过关卡：</p>
+                        
+                        <div class="pixel-game">
+                            <canvas class="pixel-canvas" id="game-canvas" width="400" height="300"></canvas>
+                        </div>
+                        
+                        <div style="margin: 20px 0;">
+                            <div>游戏代码:</div>
+                            <textarea id="game-code" style="width: 100%; height: 150px; background: #000; color: #0f0; font-family: monospace; padding: 10px; border: 2px solid #0f0; margin: 10px 0;">
 function updatePlayer() {
     // BUG: 移动速度应为5，不是2
     player.x += input.x * 2;
@@ -706,83 +905,262 @@ function updatePlayer() {
     //     unlockDoor();
     // }
 }</textarea>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn" onclick="runGameCode()">运行代码</button>
+                            <button class="btn" onclick="showHint('retro')">提示</button>
+                            <button class="btn" onclick="debugGame()">调试模式</button>
+                        </div>
+                        
+                        <div class="output" id="retro-output"></div>
+                    </div>
+                </div>
+                
+                <!-- 控制面板 -->
+                <div class="control-panel">
+                    <div class="panel-section">
+                        <div class="panel-title">时空坐标</div>
+                        <div class="time-coordinates" id="time-coordinates">
+                            <!-- 坐标将通过JS动态生成 -->
+                        </div>
                     </div>
                     
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn" onclick="runGameCode()">运行代码</button>
-                        <button class="btn" onclick="showHint('retro')">提示</button>
-                        <button class="btn" onclick="debugGame()">调试模式</button>
+                    <div class="panel-section">
+                        <div class="panel-title">循环痕迹</div>
+                        <div id="loop-traces">
+                            <div class="trace-item" onclick="showTrace(1)">
+                                <div class="trace-icon blood"></div>
+                                <div>血迹 - 第732次循环</div>
+                            </div>
+                            <div class="trace-item" onclick="showTrace(2)">
+                                <div class="trace-icon scratch"></div>
+                                <div>抓痕 - 第815次循环</div>
+                            </div>
+                            <div class="trace-item" onclick="showTrace(3)">
+                                <div class="trace-icon burn"></div>
+                                <div>烧痕 - 第901次循环</div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="output" id="retro-output"></div>
-                </div>
-            </div>
-            
-            <!-- 控制面板 -->
-            <div class="control-panel">
-                <div class="panel-section">
-                    <div class="panel-title">时空坐标</div>
-                    <div class="time-coordinates" id="time-coordinates">
-                        <!-- 坐标将通过JS动态生成 -->
-                    </div>
-                </div>
-                
-                <div class="panel-section">
-                    <div class="panel-title">循环痕迹</div>
-                    <div id="loop-traces">
-                        <div class="trace-item" onclick="showTrace(1)">
-                            <div class="trace-icon blood"></div>
-                            <div>血迹 - 第732次循环</div>
-                        </div>
-                        <div class="trace-item" onclick="showTrace(2)">
-                            <div class="trace-icon scratch"></div>
-                            <div>抓痕 - 第815次循环</div>
-                        </div>
-                        <div class="trace-item" onclick="showTrace(3)">
-                            <div class="trace-icon burn"></div>
-                            <div>烧痕 - 第901次循环</div>
+                    <div class="panel-section">
+                        <div class="panel-title">记忆碎片</div>
+                        <div id="memory-fragments">
+                            <div style="color: #666; font-size: 0.9em;">未收集</div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="panel-section">
-                    <div class="panel-title">记忆碎片</div>
-                    <div id="memory-fragments">
-                        <div style="color: #666; font-size: 0.9em;">未收集</div>
-                    </div>
-                </div>
-                
-                <div class="panel-section">
-                    <div class="panel-title">系统命令</div>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <button class="btn" onclick="saveProgress()">保存进度</button>
-                        <button class="btn" onclick="showLogs()">查看循环日志</button>
-                        <button class="btn" onclick="resetPuzzle()">重置当前谜题</button>
-                        <button class="btn" onclick="emergencyReset()" style="background: var(--error-color);">紧急重置循环</button>
+                    
+                    <div class="panel-section">
+                        <div class="panel-title">系统命令</div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <button class="btn" onclick="saveProgress()">保存进度</button>
+                            <button class="btn" onclick="showLogs()">查看循环日志</button>
+                            <button class="btn" onclick="resetPuzzle()">重置当前谜题</button>
+                            <button class="btn" onclick="emergencyReset()" style="background: var(--error-color);">紧急重置循环</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- 时间线痕迹面板 -->
-    <div class="timeline-trace" id="timeline-trace" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <div class="panel-title">时间线痕迹</div>
-            <button onclick="document.getElementById('timeline-trace').style.display='none'" style="background: none; border: none; color: white; cursor: pointer;">×</button>
+        <!-- 时间线痕迹面板 -->
+        <div class="timeline-trace" id="timeline-trace" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div class="panel-title">时间线痕迹</div>
+                <button class="btn" onclick="document.getElementById('timeline-trace').style.display='none'" style="padding: 5px 10px;">×</button>
+            </div>
+            <div id="trace-content"></div>
         </div>
-        <div id="trace-content"></div>
     </div>
 
     <script>
-        // ============ 游戏状态 ============
+        // ============ 序章系统 ============
+        const storyData = [
+            {
+                text: "冰冷的金属触感从指尖传来。\n\n你睁开眼，看到一片纯粹的白色。\n\n没有窗，没有门，只有无垠的白。\n\n记忆像破碎的镜子，散落一地。",
+                keyword: "醒来"
+            },
+            {
+                text: "房间中央，一台终端闪烁着惨绿的光。\n\n屏幕上，文字正在自动浮现：\n\n<span class='keyword'>[系统启动] 第1024次循环检测</span>\n<span class='danger'>[警告] 时空稳定度: 23.7%</span>\n<span class='warning'>[状态] 记忆碎片回收中...</span>",
+                keyword: "终端"
+            },
+            {
+                text: "然后是主信息，每一个字都敲打着你的神经：\n\n<span class='keyword'>\"又见面了，旅行者。</span>\n\n<span class='danger'>这是你的第1024次醒来。</span>\n\n想要打破循环，必须修复七个错乱的历史坐标。\n\n你只有72小时。或者，再次重启。\"",
+                keyword: "循环"
+            },
+            {
+                text: "记忆的碎片开始碰撞、重组——\n\n你不是第一次坐在这里。\n不是第一次阅读这条信息。\n\n<span class='warning'>1023次失败的尝试。</span>\n\n有些是计算错误，有些是时间不足。\n还有一些...你不敢回忆。",
+                keyword: "记忆"
+            },
+            {
+                text: "桌面上散落着笔记——<span class='keyword'>上一次的你留下的线索。</span>\n\n旁边是一台奇怪的装置，能通过网页界面连接不同的时代。\n\n七个坐标，七个时代，七次修复。\n\n但时间流已经脆弱不堪，每次错误都会留下<span class='danger'>永恒的伤痕</span>。",
+                keyword: "装置"
+            },
+            {
+                text: "古埃及的星象石板、二战时期的密码机、\n80年代的游戏BUG、未来的数字迷宫...\n\n每个坐标都是一个时代的<span class='keyword'>关键节点</span>。\n\n你必须解开这些谜题，<span class='warning'>在时间彻底崩溃之前</span>。",
+                keyword: "坐标"
+            },
+            {
+                text: "屏幕最后一次闪烁，显现出最后的文字：\n\n<span class='danger'>\"记住：</span>\n<span class='keyword'>循环不是惩罚，而是机会。</span>\n<span class='warning'>每一次失败都让你更接近真相。</span>\n\n<span class='keyword'>但这一次，</span>\n<span class='danger'>必须是最后一次。\"</span>",
+                keyword: "最后"
+            }
+        ];
+
+        let currentStoryIndex = 0;
+        const prologuePage = document.getElementById('prologue-page');
+        const storyText = document.getElementById('story-text');
+        const clickHint = document.querySelector('.click-hint');
+
+        // 初始化粒子系统
+        function initParticles() {
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const particles = [];
+            const particleCount = 100;
+            
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 0.5,
+                    speedX: Math.random() * 0.5 - 0.25,
+                    speedY: Math.random() * 0.5 - 0.25,
+                    color: `rgba(${Math.random() * 100 + 100}, ${Math.random() * 100 + 150}, ${Math.random() * 100 + 200}, ${Math.random() * 0.3 + 0.1})`
+                });
+            }
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                particles.forEach(particle => {
+                    particle.x += particle.speedX;
+                    particle.y += particle.speedY;
+                    
+                    if (particle.x < 0) particle.x = canvas.width;
+                    if (particle.x > canvas.width) particle.x = 0;
+                    if (particle.y < 0) particle.y = canvas.height;
+                    if (particle.y > canvas.height) particle.y = 0;
+                    
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    ctx.fillStyle = particle.color;
+                    ctx.fill();
+                    
+                    particles.forEach(other => {
+                        const dx = particle.x - other.x;
+                        const dy = particle.y - other.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < 100) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(0, 180, 216, ${0.1 * (1 - distance/100)})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.moveTo(particle.x, particle.y);
+                            ctx.lineTo(other.x, other.y);
+                            ctx.stroke();
+                        }
+                    });
+                });
+                
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+            
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+
+        // 显示当前故事段落
+        function showCurrentStory() {
+            if (currentStoryIndex >= storyData.length) {
+                // 故事结束，准备开始游戏
+                setTimeout(startGame, 500);
+                return;
+            }
+            
+            const paragraph = storyData[currentStoryIndex];
+            const paragraphDiv = document.createElement('div');
+            paragraphDiv.className = 'story-paragraph';
+            paragraphDiv.innerHTML = paragraph.text;
+            
+            storyText.innerHTML = '';
+            storyText.appendChild(paragraphDiv);
+            
+            // 触发动画
+            setTimeout(() => {
+                paragraphDiv.classList.add('visible');
+            }, 10);
+            
+            // 更新点击提示
+            if (currentStoryIndex < storyData.length - 1) {
+                clickHint.textContent = '点击继续...';
+                clickHint.style.opacity = '0.5';
+            } else {
+                clickHint.textContent = '点击开始游戏...';
+                clickHint.style.opacity = '1';
+            }
+        }
+
+        // 点击继续
+        function nextStory() {
+            currentStoryIndex++;
+            showCurrentStory();
+        }
+
+        // 开始游戏
+        function startGame() {
+            prologuePage.style.transition = 'opacity 1.5s ease';
+            prologuePage.style.opacity = '0';
+            
+            setTimeout(() => {
+                prologuePage.style.display = 'none';
+                document.getElementById('game-container').classList.remove('hidden');
+                initGame();
+            }, 1500);
+        }
+
+        // 跳过序章
+        function skipPrologue() {
+            if (confirm("确定要跳过背景故事吗？")) {
+                prologuePage.style.display = 'none';
+                document.getElementById('game-container').classList.remove('hidden');
+                initGame();
+            }
+        }
+
+        // 序章点击事件
+        prologuePage.addEventListener('click', nextStory);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                skipPrologue();
+            }
+            if (e.key === 'Enter' || e.key === ' ') {
+                nextStory();
+            }
+        });
+
+        // 初始化序章
+        setTimeout(() => {
+            initParticles();
+            showCurrentStory();
+        }, 100);
+
+        // ============ 主游戏系统 ============
         const gameState = {
             currentLoop: 1024,
             solvedCoordinates: 0,
             currentPuzzle: 'notes',
             notesSequence: [],
             egyptSequence: [],
-            enigmaSettings: [0, 0, 0], // 转子位置
+            enigmaSettings: [0, 0, 0],
             gameCode: '',
             memoryFragments: [],
             loopTraces: [
@@ -790,7 +1168,6 @@ function updatePlayer() {
                 { id: 2, type: 'scratch', loop: 815, text: '第815次循环：在绝望中抓挠墙壁' },
                 { id: 3, type: 'burn', loop: 901, text: '第901次循环：设备过热产生烧痕' }
             ],
-            // 笔记碎片内容
             noteFragments: [
                 { id: 1, text: '循环开始时在白色房间醒来', order: 3 },
                 { id: 2, text: '电脑显示"第1024次循环"', order: 1 },
@@ -800,7 +1177,6 @@ function updatePlayer() {
                 { id: 6, text: '明白必须同时修复所有坐标', order: 7 },
                 { id: 7, text: '留下这份笔记给下一次的我', order: 6 }
             ],
-            // 埃及象形文字
             hieroglyphs: [
                 { char: '𓆣', name: '圣甲虫' },
                 { char: '𓅃', name: '鹰' },
@@ -810,41 +1186,39 @@ function updatePlayer() {
                 { char: '𓁹', name: '眼睛' },
                 { char: '𓊹', name: '神' }
             ],
-            // 正确序列
             correctSequence: ['𓅃', '𓆣', '𓇳', '𓁹', '𓊹', '𓆨', '𓆙']
         };
 
-        // ============ 初始化 ============
-        function init() {
-            // 初始化笔记碎片
+        function initGame() {
+            // 初始化血迹
+            updateBloodstains();
+            
+            // 初始化谜题
             initNotesPuzzle();
-            
-            // 初始化埃及谜题
             initEgyptPuzzle();
-            
-            // 初始化时间坐标
             initTimeCoordinates();
-            
-            // 初始化游戏代码
             initRetroGame();
             
-            // 开始重置计时器
+            // 开始计时器
             startResetTimer();
             
-            // 随机添加血迹痕迹
-            addBloodstains();
-            
-            // 初始输出
-            addTerminalOutput('[系统] 欢迎回来，旅行者。', 'system');
-            addTerminalOutput('[系统] 检测到时间异常，请立即开始修复坐标。', 'system');
+            // 初始终端输出
+            addTerminalOutput('[系统] 时空信标已启动...', 'system');
+            addTerminalOutput('[系统] 第1024次循环开始，时间稳定度23.7%', 'system');
+            addTerminalOutput('[系统] 请立即开始修复历史坐标', 'system');
         }
 
-        // ============ 笔记谜题 ============
+        function updateBloodstains() {
+            const stains = document.querySelectorAll('.bloodstain');
+            stains.forEach(stain => {
+                stain.style.background = 'radial-gradient(circle, #8b0000 0%, transparent 70%)';
+            });
+        }
+
         function initNotesPuzzle() {
             const container = document.getElementById('note-fragments');
             container.innerHTML = '';
             
-            // 打乱碎片顺序
             const shuffled = [...gameState.noteFragments].sort(() => Math.random() - 0.5);
             
             shuffled.forEach(fragment => {
@@ -862,7 +1236,6 @@ function updatePlayer() {
                 container.appendChild(div);
             });
             
-            // 设置放置区
             const slot = document.getElementById('note-slots');
             slot.addEventListener('dragover', e => {
                 e.preventDefault();
@@ -885,8 +1258,7 @@ function updatePlayer() {
                     slot.appendChild(fragment);
                     gameState.notesSequence.push(parseInt(fragmentId));
                     
-                    // 检查是否完成
-                    if (slot.children.length === gameState.noteFragments.length + 1) { // +1 是 placeholder
+                    if (slot.children.length === gameState.noteFragments.length + 1) {
                         checkNoteOrder();
                     }
                 }
@@ -915,7 +1287,6 @@ function updatePlayer() {
                 output.innerHTML += '这次，你必须做得更好。\n\n';
                 output.innerHTML += '<span class="system">[解锁] 第一个时空坐标已激活。</span>';
                 
-                // 解锁第一个坐标
                 unlockCoordinate(1);
                 addTerminalOutput('[记忆] 第一次循环的恐惧仍然清晰...', 'system');
             } else {
@@ -924,12 +1295,10 @@ function updatePlayer() {
             }
         }
 
-        // ============ 埃及谜题 ============
         function initEgyptPuzzle() {
             const grid = document.getElementById('hieroglyph-grid');
             grid.innerHTML = '';
             
-            // 打乱顺序
             const shuffled = [...gameState.hieroglyphs].sort(() => Math.random() - 0.5);
             
             shuffled.forEach((glyph, index) => {
@@ -966,31 +1335,26 @@ function updatePlayer() {
                 return;
             }
             
-            // 检查规则
             const sequence = gameState.egyptSequence;
             let errors = [];
             
-            // 规则1: 圣甲虫(𓆣)必在鹰(𓅃)之后
             const beetleIndex = sequence.indexOf('𓆣');
             const eagleIndex = sequence.indexOf('𓅃');
             if (beetleIndex <= eagleIndex) {
                 errors.push('圣甲虫必须在鹰之后');
             }
             
-            // 规则2: 莲花(𓆨)不能在蛇(𓆙)旁边
             const lotusIndex = sequence.indexOf('𓆨');
             const snakeIndex = sequence.indexOf('𓆙');
             if (Math.abs(lotusIndex - snakeIndex) === 1) {
                 errors.push('莲花不能与蛇相邻');
             }
             
-            // 规则3: 太阳(𓇳)必须在第二或第五位
             const sunIndex = sequence.indexOf('𓇳');
             if (sunIndex !== 1 && sunIndex !== 4) {
                 errors.push('太阳必须在第二或第五位');
             }
             
-            // 规则4: 三个符号𓅃𓆣𓇳必须相邻
             const importantSymbols = ['𓅃', '𓆣', '𓇳'];
             let foundConsecutive = false;
             for (let i = 0; i <= sequence.length - 3; i++) {
@@ -1007,7 +1371,6 @@ function updatePlayer() {
             if (errors.length > 0) {
                 output.innerHTML = '<span class="error">✗ 排列错误：</span><br>' + errors.join('<br>');
             } else {
-                // 检查完全匹配
                 const isPerfect = sequence.every((char, i) => char === gameState.correctSequence[i]);
                 
                 if (isPerfect) {
@@ -1015,7 +1378,6 @@ function updatePlayer() {
                     output.innerHTML += '石板发出光芒，时间线开始稳定...\n\n';
                     output.innerHTML += '<span class="system">[解锁] 第二个时空坐标已激活。</span>';
                     
-                    // 解锁第二个坐标
                     unlockCoordinate(2);
                     addTerminalOutput('[时空] 古埃及坐标稳定，时间流+12.3%', 'success');
                 } else {
@@ -1026,15 +1388,12 @@ function updatePlayer() {
         }
 
         function autoSolveEgypt() {
-            // 自动求解逻辑（简化版）
             const solution = ['𓅃', '𓆣', '𓇳', '𓁹', '𓊹', '𓆨', '𓆙'];
             
-            // 清除所有选择
             document.querySelectorAll('.hieroglyph.selected').forEach(el => {
                 el.classList.remove('selected');
             });
             
-            // 按正确顺序选择
             setTimeout(() => {
                 solution.forEach((char, index) => {
                     setTimeout(() => {
@@ -1053,7 +1412,6 @@ function updatePlayer() {
             }, 500);
         }
 
-        // ============ 密码机谜题 ============
         function adjustRotor(rotorNum, delta) {
             const rotor = document.getElementById(`rotor-${rotorNum}`);
             let current = rotor.textContent.charCodeAt(0) - 65;
@@ -1069,7 +1427,6 @@ function updatePlayer() {
             const cipher = 'KXZTPYBMQJRWVHDCFNESGILAU'.replace(/\s/g, '');
             const settings = gameState.enigmaSettings;
             
-            // 简化版恩尼格玛加密（实际更复杂）
             let decoded = '';
             for (let i = 0; i < cipher.length; i++) {
                 const charCode = cipher.charCodeAt(i) - 65;
@@ -1077,18 +1434,15 @@ function updatePlayer() {
                 const decodedChar = (charCode - rotorShift + 26) % 26;
                 decoded += String.fromCharCode(65 + decodedChar);
                 
-                // 转子进位
                 if (i % 26 === 25) {
                     settings[0] = (settings[0] + 1) % 26;
                 }
             }
             
-            // 分组显示
             const grouped = decoded.match(/.{1,5}/g).join(' ');
             decodedText.textContent = grouped;
             
-            // 检查是否为正确消息
-            if (settings[0] === 12 && settings[1] === 3 && settings[2] === 19) { // 正确设置: M D T
+            if (settings[0] === 12 && settings[1] === 3 && settings[2] === 19) {
                 if (decoded.includes('BREAKTHECYCLE')) {
                     output.innerHTML = '<span class="success">✓ 密码破译成功！坐标已修复。</span>\n';
                     output.innerHTML += '信息: "BREAK THE CYCLE AT ORIGIN"\n\n';
@@ -1117,18 +1471,15 @@ function updatePlayer() {
                     output.innerHTML += '\n<span class="error">[系统] 暴力破解失败。密钥空间太大。</span>\n';
                     output.innerHTML += '提示：尝试历史上著名的日期设置。';
                     
-                    // 留下痕迹
                     addLoopTrace('code', gameState.currentLoop, '暴力破解恩尼格玛机失败');
                 }
             }, 100);
         }
 
-        // ============ 复古游戏谜题 ============
         function initRetroGame() {
             const canvas = document.getElementById('game-canvas');
             const ctx = canvas.getContext('2d');
             
-            // 简单游戏状态
             const game = {
                 player: { x: 50, y: 150, width: 20, height: 20 },
                 enemy: { x: 300, y: 150, width: 20, height: 20 },
@@ -1137,38 +1488,31 @@ function updatePlayer() {
             };
             
             function draw() {
-                // 清空画布
                 ctx.fillStyle = '#000';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
-                // 绘制玩家
                 ctx.fillStyle = '#00ff00';
                 ctx.fillRect(game.player.x, game.player.y, game.player.width, game.player.height);
                 
-                // 绘制敌人
                 ctx.fillStyle = '#ff0000';
                 ctx.fillRect(game.enemy.x, game.enemy.y, game.enemy.width, game.enemy.height);
                 
-                // 绘制钥匙
                 if (!game.key.collected) {
                     ctx.fillStyle = '#ffff00';
                     ctx.fillRect(game.key.x, game.key.y, game.key.width, game.key.height);
                 }
                 
-                // 绘制门
                 ctx.fillStyle = game.door.unlocked ? '#00ffff' : '#888888';
                 ctx.fillRect(game.door.x, game.door.y, game.door.width, game.door.height);
                 
-                // 绘制文本
                 ctx.fillStyle = '#ffffff';
                 ctx.font = '12px monospace';
                 ctx.fillText('使用方向键移动', 10, 20);
                 ctx.fillText('收集钥匙打开门', 10, 40);
             }
             
-            // 键盘控制
             document.addEventListener('keydown', (e) => {
-                const speed = 5; // 修复后的速度
+                const speed = 5;
                 
                 switch(e.key) {
                     case 'ArrowUp': game.player.y -= speed; break;
@@ -1177,7 +1521,6 @@ function updatePlayer() {
                     case 'ArrowRight': game.player.x += speed; break;
                 }
                 
-                // 边界检查（修复版）
                 if (game.player.x < 0) game.player.x = 0;
                 if (game.player.x > canvas.width - game.player.width) {
                     game.player.x = canvas.width - game.player.width;
@@ -1187,19 +1530,16 @@ function updatePlayer() {
                     game.player.y = canvas.height - game.player.height;
                 }
                 
-                // 碰撞检测
                 if (isColliding(game.player, game.enemy)) {
                     game.player.x = 50;
                     game.player.y = 150;
                 }
                 
-                // 钥匙收集（修复版）
                 if (!game.key.collected && isColliding(game.player, game.key)) {
                     game.key.collected = true;
                     game.door.unlocked = true;
                 }
                 
-                // 通关检测
                 if (game.door.unlocked && isColliding(game.player, game.door)) {
                     const output = document.getElementById('retro-output');
                     output.innerHTML = '<span class="success">✓ 游戏修复成功！时空坐标稳定。</span>\n';
@@ -1220,7 +1560,6 @@ function updatePlayer() {
                        rect1.y + rect1.height > rect2.y;
             }
             
-            // 初始绘制
             draw();
         }
 
@@ -1228,7 +1567,6 @@ function updatePlayer() {
             const code = document.getElementById('game-code').value;
             const output = document.getElementById('retro-output');
             
-            // 检查代码中的BUG
             const bugs = [];
             
             if (!code.includes('player.x += input.x * 5') && !code.includes('player.x += input.x * 5;')) {
@@ -1267,7 +1605,6 @@ function updatePlayer() {
             output.innerHTML += '3. 缺少钥匙收集逻辑';
         }
 
-        // ============ 坐标管理 ============
         function initTimeCoordinates() {
             const container = document.getElementById('time-coordinates');
             const coordinates = [
@@ -1297,13 +1634,11 @@ function updatePlayer() {
                 return;
             }
             
-            // 更新活动坐标
             document.querySelectorAll('.coordinate').forEach(c => {
                 c.classList.remove('active');
             });
             coord.classList.add('active');
             
-            // 切换谜题显示
             document.querySelectorAll('.puzzle-container').forEach(p => {
                 p.classList.remove('active');
             });
@@ -1321,23 +1656,19 @@ function updatePlayer() {
             gameState.solvedCoordinates++;
             document.getElementById('solved-count').textContent = gameState.solvedCoordinates;
             
-            // 更新进度条
             const progress = (gameState.solvedCoordinates / 7) * 100;
             document.getElementById('progress-fill').style.width = `${progress}%`;
             
-            // 解锁下一个坐标
             if (coordId < 7) {
                 const nextCoord = document.getElementById(`coord-${coordId + 1}`);
                 nextCoord.classList.remove('locked');
                 
-                // 添加庆祝效果
                 coord.style.animation = 'celebrate 0.5s ease';
                 setTimeout(() => {
                     coord.style.animation = '';
                 }, 500);
             }
             
-            // 添加记忆碎片
             const fragmentNames = [
                 '第一次循环的记忆',
                 '古埃及星象知识',
@@ -1355,7 +1686,6 @@ function updatePlayer() {
             return names[coordId - 1];
         }
 
-        // ============ 系统功能 ============
         function addTerminalOutput(text, type = 'normal') {
             const output = document.getElementById('terminal-output');
             const line = document.createElement('div');
@@ -1443,25 +1773,6 @@ function updatePlayer() {
             container.appendChild(traceEl);
         }
 
-        function addBloodstains() {
-            // 随机添加更多血迹
-            for (let i = 0; i < 3; i++) {
-                setTimeout(() => {
-                    const stain = document.createElement('div');
-                    stain.className = 'bloodstain';
-                    stain.style.top = `${Math.random() * 80 + 10}%`;
-                    stain.style.left = `${Math.random() * 80 + 10}%`;
-                    stain.style.width = `${Math.random() * 100 + 50}px`;
-                    stain.style.height = `${Math.random() * 80 + 30}px`;
-                    stain.style.transform = `rotate(${Math.random() * 360}deg)`;
-                    stain.style.background = `radial-gradient(circle, #8b0000 0%, transparent 70%)`;
-                    stain.style.opacity = `${Math.random() * 0.15 + 0.05}`;
-                    
-                    document.body.appendChild(stain);
-                }, i * 1000);
-            }
-        }
-
         function startResetTimer() {
             let hours = 71, minutes = 58, seconds = 23;
             
@@ -1488,13 +1799,10 @@ function updatePlayer() {
 
         function saveProgress() {
             addTerminalOutput('[系统] 进度已保存至时间缓存...', 'system');
-            // 实际应用中这里会有localStorage保存
         }
 
         function showLogs() {
-            const logs = `=== 循环日志 ===\n\n`;
             addTerminalOutput('[系统] 显示最近循环日志...', 'system');
-            // 这里可以显示更详细的日志
         }
 
         function resetPuzzle() {
@@ -1525,7 +1833,6 @@ function updatePlayer() {
                 addTerminalOutput('[紧急] 时空撕裂中...', 'error');
                 addTerminalOutput('[系统] 第1025次循环开始', 'system');
                 
-                // 页面刷新模拟循环重启
                 setTimeout(() => {
                     document.body.style.opacity = '0';
                     setTimeout(() => {
@@ -1534,9 +1841,6 @@ function updatePlayer() {
                 }, 2000);
             }
         }
-
-        // 初始化游戏
-        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
