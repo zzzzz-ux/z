@@ -62,6 +62,7 @@
 
 <h1>井字棋 · <span id="title">AI先手</span></h1>
 <button id="switchBtn" onclick="switchFirstPlayer()">切换先手</button>
+<button id="difficultyBtn" onclick="switchDifficulty()">难度：高</button>
 
 <div id="status">轮到你了（X）</div>
 
@@ -75,10 +76,18 @@ let human = 'X'
 let ai = 'O'
 let gameOver = false
 let firstPlayer = 'ai'
+let difficulty = 'high'
 
 const statusEl = document.getElementById('status')
 const switchBtn = document.getElementById('switchBtn')
+const difficultyBtn = document.getElementById('difficultyBtn')
 const titleSpan = document.getElementById('title')
+
+function switchDifficulty() {
+  difficulty = difficulty === 'high' ? 'low' : 'high'
+  difficultyBtn.textContent = '难度：' + (difficulty === 'high' ? '高' : '低')
+  resetGame()
+}
 
 function switchFirstPlayer() {
   firstPlayer = firstPlayer === 'ai' ? 'user' : 'ai'
@@ -157,6 +166,18 @@ function aiMove() {
 
 // ---------- Minimax AI ----------
 function getBestMove(board) {
+  if (difficulty === 'low') {
+    const emptyCells = []
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (!board[i][j]) {
+          emptyCells.push({ i, j })
+        }
+      }
+    }
+    return emptyCells[Math.floor(Math.random() * emptyCells.length)]
+  }
+
   let bestScore = -Infinity
   let move = {}
 
