@@ -1,389 +1,205 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
-<meta charset="UTF-8">
-<title>时空信标 · 循环自救</title>
-<style>
-:root {
-  --primary-color: #1a1a2e;
-  --secondary-color: #16213e;
-  --accent-color: #0f4c75;
-  --glow-color: #00b4d8;
-  --text-color: #e6f7ff;
-  --error-color: #ff6b6b;
-  --success-color: #51cf66;
-  --warning-color: #ffd43b;
-}
+  <meta charset="UTF-8">
+  <title>井字棋 AI 对战</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f7f7f7;
+    }
+    h1 { margin-top: 20px; }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 6px;
+      justify-content: center;
+      margin: 20px auto;
+    }
 
-body {
-  font-family: 'Courier New', monospace;
-  background: var(--primary-color);
-  color: var(--text-color);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+    .cell {
+      width: 100px;
+      height: 100px;
+      font-size: 42px;
+      background: white;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
 
-.hidden { display: none !important; }
+    .cell:hover {
+      background: #eee;
+    }
 
-/* ===== 序章 ===== */
-#prologue-page {
-  position: fixed; inset: 0;
-  background: linear-gradient(135deg,#0c0c2e,#1a1a2e,#16213e);
-  display: flex; flex-direction: column;
-  justify-content: center; align-items: center;
-  z-index: 10000; cursor: pointer;
-}
-.prologue-title { text-align:center; margin-bottom:40px; }
-.main-title { font-size:3.5em; color:#00b4d8; text-shadow:0 0 20px rgba(0,180,216,.7); }
-.sub-title { font-size:1.8em; color:#ffd43b; }
-.title-en { font-size:1.2em; color:#51cf66; letter-spacing:2px; }
+    #status {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
 
-.story-container {
-  max-width:800px; background:rgba(10,14,33,.85);
-  border:1px solid rgba(0,180,216,.3);
-  border-radius:10px; padding:40px;
-  line-height:1.8; min-height:300px;
-}
-.story-text { font-size:1.1em; min-height:200px; }
-.click-hint { text-align:center; margin-top:20px; opacity:.6; animation:pulse 2s infinite; }
-.skip-btn {
-  position:absolute; bottom:30px; right:30px;
-  background:rgba(255,107,107,.2); border:1px solid rgba(255,107,107,.5);
-  color:#ff6b6b; padding:10px 20px; border-radius:4px; cursor:pointer;
-}
-@keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
-
-/* ===== 主界面 ===== */
-.container { max-width:1200px; margin:20px auto; padding:0 20px; }
-.header {
-  background:rgba(22,33,62,.9); border:1px solid var(--glow-color);
-  border-radius:8px; padding:20px; margin-bottom:20px;
-}
-.loop-counter { color:var(--glow-color); margin-bottom:10px; }
-.progress-bar {
-  height:8px; background:rgba(255,255,255,.1);
-  border-radius:4px; overflow:hidden;
-}
-.progress-fill {
-  height:100%; background:linear-gradient(90deg,var(--accent-color),var(--glow-color));
-  width:14.28%; transition:.5s;
-}
-.main-content { display:grid; grid-template-columns:1fr 300px; gap:20px; }
-.terminal {
-  background:rgba(10,14,33,.95);
-  border:1px solid var(--accent-color);
-  border-radius:8px; padding:25px; min-height:500px;
-}
-.control-panel {
-  background:rgba(22,33,62,.9);
-  border:1px solid var(--accent-color);
-  border-radius:8px; padding:20px;
-}
-.panel-title { color:var(--glow-color); margin-bottom:15px; }
-.time-coordinates { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
-.coordinate {
-  background:rgba(15,76,117,.3); border:1px solid var(--accent-color);
-  border-radius:6px; padding:15px; text-align:center; cursor:pointer;
-}
-.coordinate.locked { opacity:.5; cursor:not-allowed; }
-.coordinate.active { background:rgba(0,180,216,.3); border-color:var(--glow-color); }
-.coordinate.solved::after { content:"✓"; position:absolute; top:5px; right:5px; color:var(--success-color); }
-
-.puzzle-container { display:none; margin-top:20px; padding:20px; background:rgba(0,0,0,.3); border-radius:6px; }
-.puzzle-container.active { display:block; }
-
-.note-fragments { display:flex; flex-wrap:wrap; gap:10px; margin:20px 0; }
-.fragment {
-  background:rgba(255,255,255,.1); border:1px dashed rgba(255,255,255,.3);
-  padding:15px; width:calc(50% - 5px); cursor:move;
-}
-.fragment.placed { background:rgba(0,180,216,.2); border-style:solid; }
-.fragment.error { border-color:var(--error-color); box-shadow:0 0 8px var(--error-color); }
-
-.fragment-slot {
-  min-height:100px; border:2px dashed rgba(255,255,255,.2);
-  margin:20px 0; padding:10px; display:flex; flex-wrap:wrap; gap:10px;
-}
-
-.output {
-  margin-top:20px; padding:15px; background:rgba(0,0,0,.5);
-  border:1px solid rgba(0,180,216,.3); border-radius:4px;
-  min-height:80px; max-height:200px; overflow-y:auto;
-}
-.output-line.success { color:var(--success-color); }
-.output-line.error { color:var(--error-color); }
-.output-line.system { color:var(--glow-color); }
-
-.btn {
-  background:var(--accent-color); color:#fff;
-  border:1px solid var(--glow-color); padding:8px 16px;
-  border-radius:4px; cursor:pointer; font-family:inherit;
-}
-.btn:hover { background:var(--glow-color); }
-
-.bloodstain {
-  position:fixed; pointer-events:none; opacity:.1; filter:blur(1px);
-  z-index:100;
-}
-
-/* CRT */
-.crt-overlay {
-  position:fixed; inset:0;
-  background:linear-gradient(rgba(0,0,0,.25) 50%,transparent 50%),
-             linear-gradient(90deg,rgba(255,0,0,.06),rgba(0,255,0,.02),rgba(0,0,255,.06));
-  background-size:100% 2px,3px 100%;
-  pointer-events:none; z-index:9999; opacity:.6;
-}
-
-@media(max-width:900px){
-  .main-content { grid-template-columns:1fr; }
-}
-</style>
+    button {
+      padding: 8px 20px;
+      font-size: 16px;
+    }
+  </style>
 </head>
-
 <body>
-<div class="crt-overlay"></div>
 
-<!-- ===== 序章 ===== -->
-<div id="prologue-page">
-  <div class="prologue-title">
-    <h1 class="main-title">时空信标</h1>
-    <h2 class="sub-title">循环自救</h2>
-    <div class="title-en">CHRONO BEACON: LOOP SALVATION</div>
-  </div>
-  <div class="story-container">
-    <div class="story-text" id="story-text"></div>
-    <div class="click-hint">点击继续...</div>
-  </div>
-  <button class="skip-btn" onclick="skipPrologue()">跳过序章 (ESC)</button>
-</div>
+<h1>井字棋 · 人机对战</h1>
+<div id="status">轮到你了（X）</div>
 
-<!-- ===== 主游戏 ===== -->
-<div id="game-container" class="hidden">
-  <div class="bloodstain" style="top:10%;left:15%;width:100px;height:80px;transform:rotate(30deg)"></div>
-  <div class="bloodstain" style="top:60%;right:20%;width:150px;height:60px;transform:rotate(-15deg)"></div>
+<div class="board" id="board"></div>
 
-  <div class="container">
-    <div class="header">
-      <div class="loop-counter">
-        第 <span id="loop-count">1024</span> 次循环 |
-        时空稳定度: <span id="stability">23.7%</span>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill"></div>
-      </div>
-      <div style="margin-top:10px;font-size:.9em;">
-        已修复坐标: <span id="solved-count">0</span>/7
-      </div>
-    </div>
-
-    <div class="main-content">
-      <div class="terminal">
-        <div style="margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid rgba(0,180,216,.3);">
-          <span class="output-line system">时空信标 v3.14.15 ></span>
-        </div>
-
-        <div id="terminal-output">
-          <div class="output-line system">[系统] 时空信标已启动...</div>
-        </div>
-
-        <!-- 笔记谜题 -->
-        <div class="puzzle-container active" id="puzzle-notes">
-          <h3>初始笔记重建</h3>
-          <p>将碎片按正确时间顺序排列：</p>
-
-          <div class="note-fragments" id="note-fragments"></div>
-          <div class="fragment-slot" id="note-slots"></div>
-
-          <div style="margin-top:20px;">
-            <button class="btn" onclick="checkNoteOrder()">验证序列</button>
-            <button class="btn" onclick="resetPuzzle()">重置当前谜题</button>
-          </div>
-
-          <div class="output" id="note-output"></div>
-        </div>
-      </div>
-
-      <div class="control-panel">
-        <div class="panel-section">
-          <div class="panel-title">时空坐标</div>
-          <div class="time-coordinates" id="time-coordinates"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<button onclick="resetGame()">重新开始</button>
 
 <script>
-/* ===== 序章 ===== */
-const storyData = [
-  "冰冷的金属触感从指尖传来。\n\n你睁开眼，看到一片纯粹的白色。\n\n没有窗，没有门，只有无垠的白。\n\n记忆像破碎的镜子，散落一地。",
-  "房间中央，一台终端闪烁着惨绿的光。\n\n屏幕上，文字正在自动浮现：\n\n[系统启动] 第1024次循环检测\n[警告] 时空稳定度: 23.7%\n[状态] 记忆碎片回收中...",
-  "然后是主信息，每一个字都敲打着你的神经：\n\n“又见面了，旅行者。”\n\n“这是你的第1024次醒来。”\n\n“想要打破循环，必须修复七个错乱的历史坐标。”\n\n“你只有72小时。或者，再次重启。”",
-  "记忆的碎片开始碰撞、重组——\n\n你不是第一次坐在这里。\n不是第一次阅读这条信息。\n\n1023次失败的尝试。\n\n有些是计算错误，有些是时间不足。\n还有一些...你不敢回忆。",
-  "桌面上散落着笔记——上一次的你留下的线索。\n\n旁边是一台奇怪的装置，能通过网页界面连接不同的时代。\n\n七个坐标，七个时代，七次修复。\n\n但时间流已经脆弱不堪，每次错误都会留下永恒的伤痕。",
-  "古埃及的星象石板、二战时期的密码机、\n80年代的游戏BUG、未来的数字迷宫...\n\n每个坐标都是一个时代的关键节点。\n\n你必须解开这些谜题，在时间彻底崩溃之前。",
-  "屏幕最后一次闪烁，显现出最后的文字：\n\n“记住：”\n\n“循环不是惩罚，而是机会。”\n\n“每一次失败都让你更接近真相。”\n\n“但这一次，必须是最后一次。”"
-];
+let board = Array.from({ length: 3 }, () => Array(3).fill(''))
+let human = 'X'
+let ai = 'O'
+let gameOver = false
 
-let storyIndex = 0;
-const storyText = document.getElementById('story-text');
+const statusEl = document.getElementById('status')
 
-function showStory(){
-  if(storyIndex >= storyData.length){
-    document.getElementById('prologue-page').innerHTML =
-      '<div style="color:#51cf66;font-size:1.5em;text-align:center;">点击进入循环</div>';
-    document.getElementById('prologue-page').onclick = startGame;
-    return;
+function render() {
+  const boardEl = document.getElementById('board')
+  boardEl.innerHTML = ''
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      const cell = document.createElement('div')
+      cell.className = 'cell'
+      cell.textContent = board[i][j]
+      cell.onclick = () => playerMove(i, j)
+      boardEl.appendChild(cell)
+    }
   }
-  storyText.innerHTML = `<div style="opacity:0;animation:fadeIn .6s forwards;">${storyData[storyIndex].replace(/\n/g,'<br>')}</div>`;
-}
-document.getElementById('prologue-page').onclick = ()=>{ storyIndex++; showStory(); };
-function skipPrologue(){ startGame(); }
-function startGame(){
-  document.getElementById('prologue-page').style.opacity='0';
-  setTimeout(()=>{
-    document.getElementById('prologue-page').classList.add('hidden');
-    document.getElementById('game-container').classList.remove('hidden');
-    initGame();
-  },800);
 }
 
-/* ===== 游戏核心 ===== */
-const gameState = {
-  solvedCoordinates: 0,
-  noteFragments: [
-    {id:1,text:'循环开始时在白色房间醒来',order:3},
-    {id:2,text:'电脑显示“第1024次循环”',order:1},
-    {id:3,text:'发现时间坐标修复系统',order:2},
-    {id:4,text:'第一次尝试修复古埃及坐标',order:4},
-    {id:5,text:'在1943年困了72小时',order:5},
-    {id:6,text:'明白必须同时修复所有坐标',order:7},
-    {id:7,text:'留下这份笔记给下一次的我',order:6}
+function playerMove(i, j) {
+  if (gameOver || board[i][j]) return
+  board[i][j] = human
+  render()
+
+  if (checkWinner(board) === human) {
+    statusEl.textContent = '🎉 你赢了！'
+    gameOver = true
+    return
+  }
+
+  if (isFull(board)) {
+    statusEl.textContent = '平局 🤝'
+    gameOver = true
+    return
+  }
+
+  statusEl.textContent = 'AI 思考中...'
+  setTimeout(aiMove, 300)
+}
+
+function aiMove() {
+  const bestMove = getBestMove(board)
+  board[bestMove.i][bestMove.j] = ai
+  render()
+
+  if (checkWinner(board) === ai) {
+    statusEl.textContent = '😈 AI 赢了'
+    gameOver = true
+    return
+  }
+
+  if (isFull(board)) {
+    statusEl.textContent = '平局 🤝'
+    gameOver = true
+    return
+  }
+
+  statusEl.textContent = '轮到你了（X）'
+}
+
+// ---------- Minimax AI ----------
+function getBestMove(board) {
+  let bestScore = -Infinity
+  let move = {}
+
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (!board[i][j]) {
+        board[i][j] = ai
+        let score = minimax(board, 0, false)
+        board[i][j] = ''
+        if (score > bestScore) {
+          bestScore = score
+          move = { i, j }
+        }
+      }
+    }
+  }
+  return move
+}
+
+function minimax(board, depth, isMaximizing) {
+  const result = checkWinner(board)
+  if (result === ai) return 10 - depth
+  if (result === human) return depth - 10
+  if (isFull(board)) return 0
+
+  if (isMaximizing) {
+    let best = -Infinity
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (!board[i][j]) {
+          board[i][j] = ai
+          best = Math.max(best, minimax(board, depth + 1, false))
+          board[i][j] = ''
+        }
+      }
+    }
+    return best
+  } else {
+    let best = Infinity
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (!board[i][j]) {
+          board[i][j] = human
+          best = Math.min(best, minimax(board, depth + 1, true))
+          board[i][j] = ''
+        }
+      }
+    }
+    return best
+  }
+}
+
+// ---------- 工具函数 ----------
+function checkWinner(b) {
+  const lines = [
+    ...b,
+    [b[0][0], b[1][0], b[2][0]],
+    [b[0][1], b[1][1], b[2][1]],
+    [b[0][2], b[1][2], b[2][2]],
+    [b[0][0], b[1][1], b[2][2]],
+    [b[0][2], b[1][1], b[2][0]]
   ]
-};
-
-function initGame(){
-  initNotesPuzzle();
-  initCoordinates();
-}
-
-/* ===== 坐标 ===== */
-function initCoordinates(){
-  const coords = [
-    {id:1,name:'初始笔记',locked:false},
-    {id:2,name:'古埃及',locked:true},
-    {id:3,name:'二战密码',locked:true},
-    {id:4,name:'复古游戏',locked:true},
-    {id:5,name:'数字纪元',locked:true},
-    {id:6,name:'未来都市',locked:true},
-    {id:7,name:'时间奇点',locked:true}
-  ];
-  document.getElementById('time-coordinates').innerHTML =
-    coords.map(c=>
-      `<div class="coordinate ${c.locked?'locked':'active'}" id="coord-${c.id}">
-        <div>坐标 ${c.id}</div>
-        <div style="font-weight:bold;margin:5px 0;">${c.name}</div>
-      </div>`
-    ).join('');
-}
-
-/* ===== 笔记谜题（修复版）===== */
-function initNotesPuzzle(){
-  const container = document.getElementById('note-fragments');
-  const slot = document.getElementById('note-slots');
-  container.innerHTML = '';
-  slot.innerHTML = '<div style="color:#666;width:100%;text-align:center;padding:30px;">将碎片拖放到此处</div>';
-
-  const shuffled = [...gameState.noteFragments].sort(()=>Math.random()-.5);
-  shuffled.forEach(f=>{
-    const d=document.createElement('div');
-    d.className='fragment'; d.textContent=f.text;
-    d.dataset.id=f.id; d.draggable=true;
-    d.ondragstart=e=>e.dataTransfer.setData('text/plain',f.id);
-    container.appendChild(d);
-  });
-
-  slot.ondragover=e=>{e.preventDefault(); slot.style.borderColor='var(--glow-color)';};
-  slot.ondragleave=()=>{slot.style.borderColor='rgba(255,255,255,.2)';};
-  slot.ondrop=e=>{
-    e.preventDefault(); slot.style.borderColor='rgba(255,255,255,.2)';
-    const id=e.dataTransfer.getData('text/plain');
-    const frag=document.querySelector(`.fragment[data-id="${id}"]`);
-    if(frag&&!frag.classList.contains('placed')){
-      frag.classList.add('placed');
-      slot.appendChild(frag);
+  for (let line of lines) {
+    if (line[0] && line[0] === line[1] && line[1] === line[2]) {
+      return line[0]
     }
-  };
-}
-
-/* ✅ 关键修复：错误不清空，仅提示 */
-function checkNoteOrder(){
-  const slot=document.getElementById('note-slots');
-  const frags=slot.querySelectorAll('.fragment.placed');
-  const out=document.getElementById('note-output');
-
-  if(frags.length<gameState.noteFragments.length){
-    out.innerHTML='<span class="output-line warning">⚠ 碎片未全部放置。</span>';
-    return;
   }
-
-  const seq=Array.from(frags).map(f=>parseInt(f.dataset.id));
-  const correct=gameState.noteFragments
-    .sort((a,b)=>a.order-b.order)
-    .map(f=>f.id);
-
-  let ok=true;
-  frags.forEach((f,i)=>{
-    f.classList.remove('error');
-    if(seq[i]!==correct[i]){
-      ok=false;
-      f.classList.add('error');
-    }
-  });
-
-  if(ok){
-    out.innerHTML=
-      '<span class="output-line success">✓ 序列正确！记忆重建成功。</span><br>'+
-      '<span class="output-line system">[解锁] 第一个时空坐标已激活。</span>';
-    unlockCoordinate(1);
-  }else{
-    out.innerHTML=
-      '<span class="output-line error">✗ 序列错误。时间线仍然混乱。</span><br>'+
-      '<span class="output-line warning">已标记错误位置，可直接拖动修正。</span>';
-  }
+  return null
 }
 
-function unlockCoordinate(id){
-  const c=document.getElementById(`coord-${id}`);
-  c.classList.remove('locked');
-  c.classList.add('solved');
-  gameState.solvedCoordinates++;
-  document.getElementById('solved-count').textContent=gameState.solvedCoordinates;
-  document.getElementById('progress-fill').style.width=`${(gameState.solvedCoordinates/7)*100}%`;
-  if(id<7) document.getElementById(`coord-${id+1}`).classList.remove('locked');
+function isFull(b) {
+  return b.flat().every(cell => cell)
 }
 
-/* ✅ 重置仅清空未完成状态 */
-function resetPuzzle(){
-  const slot=document.getElementById('note-slots');
-  if(slot.querySelectorAll('.fragment.placed').length===gameState.noteFragments.length){
-    alert('已完成的谜题无法重置');
-    return;
-  }
-  initNotesPuzzle();
-  document.getElementById('note-output').innerHTML='谜题已重置。';
+function resetGame() {
+  board = Array.from({ length: 3 }, () => Array(3).fill(''))
+  gameOver = false
+  statusEl.textContent = '轮到你了（X）'
+  render()
 }
 
-/* ===== 动画 ===== */
-const style=document.createElement('style');
-style.textContent=`@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`;
-document.head.appendChild(style);
-
-/* 启动 */
-showStory();
+render()
 </script>
+
 </body>
 </html>
